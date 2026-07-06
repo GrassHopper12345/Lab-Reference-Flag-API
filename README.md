@@ -16,7 +16,7 @@ A clean, well-documented REST API for clinical lab value interpretation. Accepts
 Covers common panels including:
 - **Complete Blood Count (CBC):** WBC, RBC, Hemoglobin, Hematocrit, Platelets, MCV, MCH, MCHC, RDW
 - **Comprehensive Metabolic Panel (CMP):** BMP electrolytes, BUN, Creatinine, eGFR, Glucose, AST, ALT, ALP, Total Bilirubin, Total Protein, Albumin
-- **Lipid Panel:** Total Cholesterol, LDL, HDL, Triglycerides, non-HDL
+- **Lipid Panel:** Total Cholesterol, LDL, HDL, Triglycerides, non-HDL (calculated)
 - **Thyroid:** TSH, Free T3, Free T4
 - **Inflammatory Markers:** CRP, ESR, Ferritin
 - **Vitamins & Minerals:** Vitamin D, B12, Folate, Iron, TIBC, Magnesium, Zinc
@@ -41,7 +41,8 @@ Covers common panels including:
 | [C#](https://learn.microsoft.com/en-us/dotnet/csharp/) | Primary language |
 | [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/) | ORM for database access and migrations |
 | [PostgreSQL](https://www.postgresql.org/) | Relational database for biomarker and reference range data |
-| [Swagger / Scalar](https://scalar.com/) | Auto-generated interactive API documentation |
+| [OpenAPI](https://www.openapis.org/) | API specification standard for auto-generated docs |
+| [Scalar](https://scalar.com/) | Interactive API documentation UI (replaces Swagger UI) |
 | [FluentValidation](https://fluentvalidation.net/) | Request model validation |
 | [xUnit](https://xunit.net/) | Unit and integration testing |
 | [Docker](https://www.docker.com/) | Containerized local development and deployment |
@@ -105,14 +106,47 @@ POST /api/results/interpret/batch
 }
 ```
 
+#### Example Response — Batch Panel
+
+```json
+{
+  "patientSex": "male",
+  "patientAge": 45,
+  "results": [
+    {
+      "testName": "WBC",
+      "value": 11.2,
+      "unit": "10^3/uL",
+      "referenceRange": { "min": 4.5, "max": 11.0, "unit": "10^3/uL" },
+      "flag": "High",
+      "severity": "Abnormal",
+      "clinicalContext": "White blood cells are the primary cells of the immune system. Elevated counts may indicate infection, inflammation, or hematologic conditions.",
+      "interpretation": "Value is above the reference range."
+    },
+    {
+      "testName": "Hemoglobin",
+      "value": 14.5,
+      "unit": "g/dL",
+      "referenceRange": { "min": 13.5, "max": 17.5, "unit": "g/dL" },
+      "flag": "Normal",
+      "severity": "Normal",
+      "clinicalContext": "Hemoglobin carries oxygen in red blood cells.",
+      "interpretation": "Value is within the reference range for adult males."
+    }
+  ]
+}
+```
+
 ### Biomarker Reference Data
 
 ```
 GET    /api/biomarkers                List all supported biomarkers
 GET    /api/biomarkers/{name}         Get reference range and context for a specific biomarker
-POST   /api/biomarkers               Add a new biomarker entry (admin)
-PUT    /api/biomarkers/{id}          Update a biomarker's reference range (admin)
+POST   /api/biomarkers               Add a new biomarker entry (admin*)
+PUT    /api/biomarkers/{id}          Update a biomarker's reference range (admin*)
 ```
+
+> \* Admin endpoints are currently open. OAuth2 / API key authentication is planned — see [Roadmap](#roadmap).
 
 ---
 
@@ -158,13 +192,13 @@ cd lab-reference-api
 docker compose up -d
 
 # Apply EF Core migrations
-dotnet ef database update
+dotnet ef database update --project LabReferenceApi --startup-project LabReferenceApi
 
 # Run the API
 dotnet run --project LabReferenceApi
 ```
 
-Swagger UI available at: [http://localhost:5000/swagger](http://localhost:5000/swagger)
+Scalar UI available at: [http://localhost:5000/scalar](http://localhost:5000/scalar)
 
 ### Environment Variables
 
