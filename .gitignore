@@ -1,0 +1,26 @@
+## Build outputs
+bin/
+obj/
+
+## IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+## Sensitive config
+LabReferenceApi/appsettings.Development.json
+
+## dotnet
+*.nupkg
+*.snupkg
+project.lock.json
+.dotnet/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Test results
+TestResults/
+coverage/
