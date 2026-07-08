@@ -1,3 +1,4 @@
+using LabReferenceApi.Data.Seed;
 using LabReferenceApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,5 +36,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(r => r.BiomarkerId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<Biomarker>().HasData(BiomarkerSeedData.GetBiomarkers());
+        modelBuilder.Entity<ReferenceRange>().HasData(ReferenceRangeSeedData.GetReferenceRanges());
     }
 }
